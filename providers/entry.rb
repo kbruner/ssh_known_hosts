@@ -40,7 +40,10 @@ action :create do
 
     run = Mixlib::ShellOut.new("ssh-keyscan -t#{node['ssh_known_hosts']['key_type']} -p #{new_resource.port} #{new_resource.host}", timeout: 15)
     run.run_command
-    return if run.error?
+    if run.error?
+      Chef::Log.warn "ssh-keyscan to #{new_resource.host} timed out"
+      return
+    end
     key = run.stdout
 
   end
